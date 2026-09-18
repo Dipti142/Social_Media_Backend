@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SocialSync | Next-Gen Social & Auth Platform</title>
+  <meta name="description" content="A futuristic, high-performance social platform with JWT authentication, OTP verification, and live API exploration." />
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%3E<text y=%2226%22 font-size=%2224%22>⚡</text></svg>" />
+</head>
+<body>
+
+  <!-- Ambient Glow Background Orbs -->
+  <div class="bg-glow-orb orb-1"></div>
+  <div class="bg-glow-orb orb-2"></div>
+  <div class="bg-glow-orb orb-3"></div>
+
+  <!-- Header / Navbar -->
+  <header class="app-navbar">
+    <div class="brand-container" onclick="window.location.reload()">
+      <div class="brand-logo">⚡</div>
+      <h1 class="brand-title">SocialSync</h1>
+    </div>
+
+    <div class="nav-actions">
+      <!-- Live Server Health Status -->
+      <div id="backend-status-pill" class="status-pill">
+        <span class="status-dot"></span>
+        <span id="backend-status-text">Checking Server...</span>
+      </div>
+
+      <!-- Live API Tester Button -->
+      <button class="btn btn-secondary btn-sm btn-open-api-inspector" title="Open Interactive API Tester">
+        <span>⚡</span>
+        <span>API Console</span>
+      </button>
+
+      <!-- Auth State Actions -->
+      <button id="nav-login-btn" class="btn btn-primary btn-sm" onclick="switchAuthTab('login')">
+        Sign In
+      </button>
+
+      <div id="nav-user-profile" style="display: none; align-items: center; gap: 10px;">
+        <button class="btn btn-danger btn-sm btn-logout-trigger">
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       1. AUTHENTICATION SECTION (Tabs: Sign In, Sign Up, Verify OTP, Send OTP)
+       ========================================================================= -->
+  <main id="auth-wrapper" class="auth-wrapper">
+    <div class="auth-card">
+      
+      <!-- Nav Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" data-tab="login">Sign In</button>
+        <button class="auth-tab-btn" data-tab="register">Sign Up</button>
+        <button class="auth-tab-btn" data-tab="verifyOtp">Verify OTP</button>
+        <button class="auth-tab-btn" data-tab="sendOtp">Send OTP</button>
+      </div>
+
+      <!-- TAB 1: SIGN IN -->
+      <div id="view-login" class="auth-view active">
+        <div class="auth-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to your account with email or username</p>
+        </div>
+
+        <form id="form-login">
+          <div class="form-group">
+            <label class="form-label" for="login-identifier">Email or Username</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" id="login-identifier" class="form-control" placeholder="user@example.com or johndoe" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="login-password" class="form-control" placeholder="••••••••••••" required />
+            </div>
+          </div>
+
+          <button type="submit" id="btn-login-submit" class="btn btn-primary btn-full">
+            Sign In
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Don't have an account? <a href="#" id="link-to-register">Sign Up</a>
+        </div>
+      </div>
+
+      <!-- TAB 2: SIGN UP -->
+      <div id="view-register" class="auth-view">
+        <div class="auth-header">
+          <h2>Create Account</h2>
+          <p>Join the next-gen social community today</p>
+        </div>
+
+        <form id="form-register">
+          <div class="form-group">
+            <label class="form-label" for="reg-username">Username</label>
+            <div class="input-wrapper">
+              <span class="input-icon">@</span>
+              <input type="text" id="reg-username" class="form-control" placeholder="Choose a unique username" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉</span>
+              <input type="email" id="reg-email" class="form-control" placeholder="name@domain.com" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="reg-password" class="form-control" placeholder="Create strong password" required />
+            </div>
+            <div class="password-meter">
+              <div id="reg-password-meter" class="password-meter-fill"></div>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-register-submit" class="btn btn-primary btn-full">
+            Create Account
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Already registered? <a href="#" id="link-to-login">Sign In</a>
+        </div>
+      </div>
+
+      <!-- TAB 3: VERIFY OTP -->
+      <div id="view-verifyOtp" class="auth-view">
+        <div class="auth-header">
+          <h2>Verify Your OTP</h2>
+          <p>Enter the 6-digit code sent to your email</p>
+        </div>
+
+        <form id="form-verify-otp">
+          <div class="form-group">
+            <label class="form-label" for="verify-otp-email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉</span>
+              <input type="email" id="verify-otp-email" class="form-control" placeholder="name@domain.com" required />
+            </div>
+          </div>
+
+          <label class="form-label" style="text-align: center; display: block;">6-Digit OTP Code</label>
+          <div class="otp-boxes-container">
+            <input type="text" class="otp-box-input" maxlength="1" inputmode="numeric" />
+            <input type="text" class="otp-box-input" maxlength="1" inputmode="numeric" />
+            <input type="text" class="otp-box-input" maxlength="1" inputmode="numeric" />
+            <input type="text" class="otp-box-input" maxlength="1" inputmode="numeric" />
+            <input type="text" class="otp-box-input" maxlength="1" inputmode="numeric" />
+            <input type="text" class="otp-box-input" maxlength="1" inputmode="numeric" />
+          </div>
+
+          <button type="submit" id="btn-verify-otp-submit" class="btn btn-primary btn-full">
+            Verify Code
+          </button>
+        </form>
+
+        <div class="auth-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <a href="#" id="link-to-send-otp">Request new OTP</a>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-resend-otp">
+            Resend <span id="otp-timer-display"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 4: SEND OTP -->
+      <div id="view-sendOtp" class="auth-view">
+        <div class="auth-header">
+          <h2>Request OTP Code</h2>
+          <p>We'll deliver a 6-digit verification code to your email</p>
+        </div>
+
+        <form id="form-send-otp">
+          <div class="form-group">
+            <label class="form-label" for="send-otp-email">Email Address</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉</span>
+              <input type="email" id="send-otp-email" class="form-control" placeholder="behera46013@gmail.com" required />
+            </div>
+          </div>
+
+          <button type="submit" id="btn-send-otp-submit" class="btn btn-primary btn-full">
+            Send Verification Code
+          </button>
+        </form>
+
+        <div class="auth-footer">
+          Already got a code? <a href="#" id="link-to-verify-otp">Verify OTP</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       2. AUTHENTICATED SOCIAL DASHBOARD & FEED
+       ========================================================================= -->
+  <div id="dashboard-container" class="dashboard-container">
+    
+    <!-- LEFT SIDEBAR: User Profile Card -->
+    <aside class="sidebar-left">
+      <div class="profile-card">
+        <div class="profile-avatar-wrap">
+          <div id="profile-avatar-initials" class="profile-avatar">US</div>
+          <div id="profile-badge-indicator"></div>
+        </div>
+
+        <h3 id="profile-display-username" class="profile-username">@username</h3>
+        <p id="profile-display-email" class="profile-email">user@example.com</p>
+        <span id="profile-display-role" class="role-pill">USER</span>
+
+        <div class="profile-stats">
+          <div class="stat-item">
+            <h4>24</h4>
+            <p>Posts</p>
+          </div>
+          <div class="stat-item">
+            <h4>1.4k</h4>
+            <p>Followers</p>
+          </div>
+          <div class="stat-item">
+            <h4>380</h4>
+            <p>Following</p>
+          </div>
+        </div>
+
+        <button class="btn btn-danger btn-full btn-logout-trigger">
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- CENTER: Stories, Post Composer, and Feed -->
+    <section class="feed-column">
+      <!-- Stories Carousel -->
+      <div class="stories-container">
+        <div class="story-item">
+          <div class="story-ring">
+            <div class="story-avatar">+</div>
+          </div>
+          <span class="story-username">Your Story</span>
+        </div>
+        <div class="story-item">
+          <div class="story-ring">
+            <div class="story-avatar">🤖</div>
+          </div>
+          <span class="story-username">Antigravity</span>
+        </div>
+        <div class="story-item">
+          <div class="story-ring">
+            <div class="story-avatar">🚀</div>
+          </div>
+          <span class="story-username">Node.js</span>
+        </div>
+        <div class="story-item">
+          <div class="story-ring">
+            <div class="story-avatar">⚡</div>
+          </div>
+          <span class="story-username">DevTeam</span>
+        </div>
+      </div>
+
+      <!-- Create Post Composer -->
+      <div class="create-post-card">
+        <form id="form-create-post">
+          <textarea id="create-post-text" class="create-post-textarea" placeholder="What's happening in your dev world today?"></textarea>
+          <div class="create-post-actions">
+            <div class="post-media-buttons">
+              <button type="button" class="btn btn-ghost btn-sm" title="Add Image">📷 Photo</button>
+              <button type="button" class="btn btn-ghost btn-sm" title="Add Tag">🏷️ Tag</button>
+              <button type="button" class="btn btn-ghost btn-sm" title="Add Emoji">😀 Feeling</button>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Publish Post</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Feed Posts Container -->
+      <div id="feed-posts-container"></div>
+    </section>
+
+    <!-- RIGHT SIDEBAR: Session & JWT Token Inspector -->
+    <aside class="sidebar-right">
+      <div class="session-card">
+        <h3>
+          <span>🔐 JWT Session</span>
+          <button class="btn btn-ghost btn-sm btn-open-api-inspector" title="Open API Console">⚡ Tester</button>
+        </h3>
+        
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Access Token (Active):</p>
+        <div id="debug-access-token" class="token-meta">No token</div>
+
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">Refresh Token (Stored):</p>
+        <div id="debug-refresh-token" class="token-meta">No token</div>
+
+        <button id="btn-manual-refresh-token" class="btn btn-secondary btn-full btn-sm" style="margin-top: 10px;">
+          🔄 Rotate / Refresh Token
+        </button>
+      </div>
+
+      <div class="session-card">
+        <h3 style="font-size: 14px; margin-bottom: 12px;">🔥 Trending Topics</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px;">
+          <div><strong>#NodeJS</strong> <span style="color: var(--text-muted); font-size: 11px;">12.4k posts</span></div>
+          <div><strong>#PostgreSQL</strong> <span style="color: var(--text-muted); font-size: 8.9k posts</span></div>
+          <div><strong>#JWT_Authentication</strong> <span style="color: var(--text-muted); font-size: 5.2k posts</span></div>
+          <div><strong>#WebSockets</strong> <span style="color: var(--text-muted); font-size: 3.1k posts</span></div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- =========================================================================
+       3. INTERACTIVE LIVE API INSPECTOR MODAL
+       ========================================================================= -->
+  <div id="api-inspector-modal" class="modal-backdrop">
+    <div class="api-modal">
+      <div class="modal-header">
+        <h3>
+          <span>⚡</span>
+          <span>SocialSync Live API Tester</span>
+        </h3>
+        <button id="btn-close-api-inspector" class="btn btn-ghost btn-sm" style="font-size: 18px;">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="api-grid">
+          <!-- Left: Endpoints List -->
+          <div class="api-endpoint-list">
+            <p style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Endpoints</p>
+            <div class="api-endpoint-item active" data-endpoint="health">
+              <span>Health Check</span>
+              <span class="method-tag method-get">GET</span>
+            </div>
+            <div class="api-endpoint-item" data-endpoint="register">
+              <span>Register</span>
+              <span class="method-tag method-post">POST</span>
+            </div>
+            <div class="api-endpoint-item" data-endpoint="login">
+              <span>Login</span>
+              <span class="method-tag method-post">POST</span>
+            </div>
+            <div class="api-endpoint-item" data-endpoint="sendOtp">
+              <span>Send OTP</span>
+              <span class="method-tag method-post">POST</span>
+            </div>
+            <div class="api-endpoint-item" data-endpoint="verifyOtp">
+              <span>Verify OTP</span>
+              <span class="method-tag method-post">POST</span>
+            </div>
+            <div class="api-endpoint-item" data-endpoint="refreshToken">
+              <span>Refresh Token</span>
+              <span class="method-tag method-post">POST</span>
+            </div>
+            <div class="api-endpoint-item" data-endpoint="logout">
+              <span>Logout</span>
+              <span class="method-tag method-post">POST</span>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Request & Response Sandbox -->
+          <div class="api-sandbox">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h4 id="inspector-title" style="font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--accent-primary);">GET /health</h4>
+              <span id="inspector-status-badge" class="status-pill">READY</span>
+            </div>
+            <p id="inspector-desc" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">
+              Verify that backend API server is healthy and responding.
+            </p>
+
+            <label class="form-label">Request Payload (JSON):</label>
+            <textarea id="inspector-payload" class="create-post-textarea" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; height: 100px;"></textarea>
+
+            <div style="display: flex; justify-content: flex-end; margin: 10px 0 16px;">
+              <button id="btn-run-inspector-request" class="btn btn-primary btn-sm">
+                Send Request 🚀
+              </button>
+            </div>
+
+            <label class="form-label">Live Response:</label>
+            <pre id="inspector-response" class="json-preview">// Response will display here after execution</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Rack Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="./js/api.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
